@@ -64,6 +64,7 @@ class AdminCreateCommand extends Command
         $roles   = $user->getRoles();
         $roles[] = Roles::ROLE_ADMIN;
         $user->setRoles($roles);
+        # validate users
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         $io->success('You successfully create administrator.');
