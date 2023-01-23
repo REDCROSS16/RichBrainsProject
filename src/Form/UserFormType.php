@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -72,6 +73,10 @@ class UserFormType extends AbstractType
                 ]
             ]
             )
+            ->add('roles', null,
+            [
+                'mapped' => false
+            ])
         ;
     }
 

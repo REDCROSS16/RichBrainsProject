@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api\Admin;
 
 use App\Entity\User;
 use App\Form\UserFormType;
@@ -10,9 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/register', name: 'register', methods: ['POST'])]
+#[IsGranted('ROLE_ADMIN')]
+#[Route('/admin/users', name: 'create_user', methods: ['POST'])]
 class RegisterNewUserAction extends AbstractController
 {
     public function __construct(
@@ -34,14 +36,13 @@ class RegisterNewUserAction extends AbstractController
             $password = $request->request->get('password');
             $user->setPassword($this->hasher->hashPassword($user, $password));
 
-
             if (count($this->validator->validate($user)) === 0) {
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
                 return new Response(
                     \sprintf('User %s successfully created', $user->getFirstName()),
-                    201
+                    Response::HTTP_CREATED
                 );
             }
         }
