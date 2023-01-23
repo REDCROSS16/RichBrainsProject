@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsCommand(
     name: 'app:admin:create',
@@ -22,13 +23,10 @@ class AdminCreateCommand extends Command
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $userPasswordHasher,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly ValidatorInterface $validator
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,11 +62,18 @@ class AdminCreateCommand extends Command
         $roles   = $user->getRoles();
         $roles[] = Roles::ROLE_ADMIN;
         $user->setRoles($roles);
-        # validate users
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-        $io->success('You successfully create administrator.');
 
-        return Command::SUCCESS;
+        $errors = $this->validator->validate($user);
+        if (count($errors) === 0) {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            $io->success('You successfully create administrator.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->error((string)$errors);
+
+        return Command::FAILURE;
     }
 }

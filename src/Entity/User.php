@@ -14,6 +14,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+    public function __construct()
+    {
+        $this->roles[] = Roles::ROLE_USER;
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer', length: 40)]
@@ -36,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $phoneNumber;
 
     #[ORM\Column]
-    private array $roles = [];
+    private array $roles;
 
     #[ORM\Column]
     private string $password;
@@ -96,7 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $roles[] = Roles::ROLE_USER;
+//        $roles[] = Roles::ROLE_USER;
 
         return array_unique($roles);
     }

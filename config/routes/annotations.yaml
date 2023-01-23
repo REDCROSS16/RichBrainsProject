@@ -1,0 +1,6 @@
+api:
+    resource: '../../src/Controller/'
+    type: annotation
+    name_prefix: api_
+    # this prefix is added to all the action URLs
+    prefix: /api
