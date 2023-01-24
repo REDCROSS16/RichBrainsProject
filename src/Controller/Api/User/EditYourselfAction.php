@@ -14,8 +14,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use OpenApi\Annotations as OA;
 
 // TODO: method 'PATCH' don't work with request
+/**
+ * @OA\Post(
+ *     tags={"Update yourself"},
+ *     summary="Update yourself",
+ *     @OA\Response(response="200", description="User successfully update"),
+ *     @OA\Response(response="404", description="User not update, exist errors"),
+ * )
+ */
 #[Route('/user', name: 'edit_yourself', methods: ['POST'])]
 class EditYourselfAction extends AbstractController
 {

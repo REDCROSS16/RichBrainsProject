@@ -11,9 +11,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Post(
+ *     tags={"Register new user"},
+ *     summary="Create and register new user",
+ *     @OA\Response(response="201", description="User successfully created"),
+ *     @OA\Response(response="404", description="User not created, exist errors"),
+ * )
+ */
 #[Route('/admin/users', name: 'create_user', methods: ['POST'])]
 class RegisterNewUserAction extends AbstractController
 {
@@ -50,6 +58,6 @@ class RegisterNewUserAction extends AbstractController
 
         $errors = $this->checker->check($user, $form);
 
-        return new Response($errors, status: 424);
+        return new Response($errors, Response::HTTP_NOT_FOUND);
     }
 }

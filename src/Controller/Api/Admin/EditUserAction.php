@@ -8,14 +8,22 @@ use App\Entity\User;
 use App\Form\UserFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-// TODO: method 'PATCH' don't work with request
+// TODO: method 'PATCH' doesn't work with request
+/**
+ * @OA\Post(
+ *     tags={"Admin user editing"},
+ *     summary="Update user info by ID",
+ *     @OA\Response(response="200", description="User successfully updated"),
+ *     @OA\Response(response="404", description="User not update, exist errors"),
+ * )
+ */
 #[Route('/admin/users/{id<\d+>}', name: 'edit_user', methods: ['POST'])]
 class EditUserAction extends AbstractController
 {

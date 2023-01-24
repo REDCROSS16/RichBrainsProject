@@ -29,11 +29,4 @@ class FormErrorsChecker
 
         return $errors;
     }
-
-    public function validate($user)
-    {
-        $errors = $this->validator->validate($user);
-
-        return $errors;
-    }
 }
