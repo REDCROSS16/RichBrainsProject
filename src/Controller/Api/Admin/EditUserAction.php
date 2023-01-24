@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller\Api\User;
+namespace App\Controller\Api\Admin;
 
+use App\Component\FormErrorsChecker;
 use App\Entity\ENUM\Roles;
 use App\Entity\User;
 use App\Form\UserFormType;
@@ -14,28 +15,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-
-#[Route('/admin/users/{id<\d+>}', name: 'update_user', methods: ['POST'])]
+// TODO: method 'PATCH' don't work with request
+#[Route('/admin/users/{id<\d+>}', name: 'edit_user', methods: ['POST'])]
 class EditUserAction extends AbstractController
 {
     public function __construct(
         readonly private EntityManagerInterface $entityManager,
         readonly private UserPasswordHasherInterface $hasher,
         readonly private ValidatorInterface $validator,
-        readonly private Security $security
+        readonly private FormErrorsChecker $checker
     )
     {
     }
 
     public function __invoke(User $user, Request $request): Response
     {
-
-        if ($this->security->getUser() !== $user ||
-            array_key_exists(Roles::ROLE_ADMIN->value, array_flip($this->security->getUser()->getRoles())) === false)
-        {
-            return $this->json('FORBIDDEN', Response::HTTP_FORBIDDEN);
-        }
-
         $data = $request->request->all();
         $form = $this->createForm(UserFormType::class, $user);
         $form->submit($data);
@@ -63,15 +57,7 @@ class EditUserAction extends AbstractController
                 );
             }
         }
-
-        $errors = $this->validator->validate($user);
-
-        foreach ($form->getErrors() as $key => $error) {
-            if (!$form->isRoot()) {
-                $errors .= $error->getMessage() . '\r\n';
-            }
-            $errors .= $error->getMessage();
-        }
+        $errors = $this->checker->check($user, $form);
 
         return new Response($errors, status: 424);
 

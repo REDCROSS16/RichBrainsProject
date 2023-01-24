@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api\Admin;
 
+use App\Component\FormErrorsChecker;
 use App\Entity\User;
 use App\Form\UserFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,14 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/users', name: 'create_user', methods: ['POST'])]
 class RegisterNewUserAction extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $hasher,
-        private readonly ValidatorInterface $validator
+        readonly private EntityManagerInterface $entityManager,
+        readonly private UserPasswordHasherInterface $hasher,
+        readonly private ValidatorInterface $validator,
+        readonly private FormErrorsChecker $checker
     )
     {
     }
@@ -47,15 +48,7 @@ class RegisterNewUserAction extends AbstractController
             }
         }
 
-//        dd($form->getErrors());
-
-        $errors = $this->validator->validate($user);
-        foreach ($form->getErrors() as $key => $error) {
-            if (!$form->isRoot()) {
-                $errors .= $error->getMessage() . '\r\n';
-            }
-            $errors .= $error->getMessage();
-        }
+        $errors = $this->checker->check($user, $form);
 
         return new Response($errors, status: 424);
     }
